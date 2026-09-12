@@ -204,15 +204,6 @@
     from{opacity:0;transform:translateY(10px)}
     to{opacity:1;transform:none}
   }
-  .close-note{
-    font-family:var(--font-serif);
-    font-variation-settings:"SOFT" 100, "opsz" 24;
-    font-weight:300;
-    font-size:19px;
-    color:var(--ink-soft);
-    margin:22px 0 0;
-    animation:rise .5s ease both;
-  }
   .actions{
     display:flex;
     gap:10px;
@@ -373,7 +364,7 @@
 
   @media (prefers-reduced-motion:reduce){
     .sunflower{animation:none}
-    .quote.enter,.close-note,.letter.enter,.letter-sun{animation:none}
+    .quote.enter,.letter.enter,.letter-sun{animation:none}
     *{transition:none !important}
   }
   @media (min-width:600px){
@@ -430,10 +421,9 @@
       <div class="qcard">
         <p class="qlabel" id="qlabel"></p>
         <p class="quote" id="quote" aria-live="polite"></p>
-        <p class="close-note" id="closeNote" hidden>That’s enough for today.</p>
         <div class="actions">
           <button class="btn" id="backBtn" type="button">Back</button>
-          <button class="btn primary" id="moreBtn" type="button">One more</button>
+          <button class="btn primary" id="moreBtn" type="button">Next</button>
         </div>
       </div>
      </div>
@@ -479,23 +469,15 @@ const GATE_ENABLED = true;
 const PASSCODE_HASH = "24835044";
 const NIGHT_FROM = 21;   // 9pm
 const NIGHT_TO   = 6;    // 6am
-const MAX_PER_SESSION = 5;   // messages per visit before the soft close
 const BIRTHDAY = { month: 5, day: 1 };
-const CLOSE_NOTES = [
-  "That\u2019s enough for today. Come back whenever.",
-  "Enough for now. You are very easy to care about.",
-  "That\u2019s all for today. Someone thought of you before you opened this.",
-  "Enough. Go be around your people, or go sleep. Both count.",
-  "That\u2019s it for today. You are more loved than you let people say."
-];
+
 const WHATSAPP_NUMBER = "919829371844";   // country code + number, digits only
 
 /* =========================================================
    MESSAGES
-   tags:  joke  = inside joke, max one per session
-          faith = one per session
-          stay  = never in the same session as a 'quiet' one
-          quiet = never in the same session as a 'stay' one
+   Each open shuffles the mood's messages into a fresh random
+   order. "Next" walks through them; when the list runs out it
+   reshuffles. Tags are kept for reference only.
    ========================================================= */
 const MOODS = [
   {
@@ -515,7 +497,10 @@ const MOODS = [
       {t:"Aaj fit check ka din hai. Koi bhi outfit, koi bhi mirror. Photo kisi ko bhejni zaroori nahi. Bas khud dekh lo ki tum aaj bhi sorted lag rahi ho.", tags:[]},
       {t:"Tum gossip se bore hoti ho, meetings se bore hoti ho, khaali din se bore hoti ho. Sirf ek cheez se kabhi bore nahi hoti: baatein. Toh kisi ko pakdo aur shuru ho jao.", tags:[]},
       {t:"\u201cKahi bhi chale gaye, kahi bhi baith gaye, kuch bhi kar liya.\u201d Tumhare best din aise hi hote hain, bina plan ke. Aaj bhi koi plan mat banao. Bas nikal jao.", tags:[]},
-      {t:"Gallery mein woh white dress aur sunflowers wali photos dhoondho. Jo insaan un photos mein hai, usko bore hone ka haq nahi hai.", tags:[]}
+      {t:"Gallery mein woh white dress aur sunflowers wali photos dhoondho. Jo insaan un photos mein hai, usko bore hone ka haq nahi hai.", tags:[]},
+      {t:"Tumne bola tha painting pasand hai, par karti nahi. Aaj koi bhi aadhi-adhoori cheez shuru kar do. Poori karna zaroori nahi. Shuru karna hi scene hai.", tags:[]},
+      {t:"Bore ho? Ek fancy si jagah dhoondho, akele jao, coffee lo, aur logon ko dekho. Tumhe aesthetic jagah pasand hai, tumne khud bola tha. Dubai mein kami nahi hai.", tags:[]},
+      {t:"Ek aur baar YJHD dekh lo. Haan, pata hai, dekhi hui hai. Isi liye toh chalti hai.", tags:[]}
     ]
   },
   {
@@ -531,7 +516,10 @@ const MOODS = [
       {t:"Ghar pe \u201csab theek hai\u201d bolna theek hai. Yahan bol sakti ho ki din ganda tha. Dono sach hain. Kal phir jaogi, aur woh phir jalenge. Yeh bhi routine ka hissa hai.", tags:[]},
       {t:"Do saal ka contract unke attitude ke saath nahi hai, kaam ke saath hai. Log badalte hain, teams badalti hain, HR bhi badalti hai. Tumhara kaam wahi rehta hai, aur wahi ginti mein aata hai.", tags:[]},
       {t:"Tumhe kadwa sach sunna bhi aata hai aur bolna bhi. Office mein log isse darte hain, aur isi wajah se tumpe bharosa bhi karte hain. Dono ek saath chalte hain.", tags:[]},
-      {t:"Aaj kisi ne tumhara mood kharab kiya, tumhara kaam nahi. Kaam abhi bhi tumhara hai, aur woh unse better hai. Isi liye toh problem hai.", tags:[]}
+      {t:"Aaj kisi ne tumhara mood kharab kiya, tumhara kaam nahi. Kaam abhi bhi tumhara hai, aur woh unse better hai. Isi liye toh problem hai.", tags:[]},
+      {t:"Aaj kisi ne kuch aisa bola jo ghar tak saath aa gaya? Woh office ke gate pe chhodna tha. Kal jaake wahi chhod dena. Woh tumhara samaan nahi hai.", tags:[]},
+      {t:"Tum wahan kaam karne gayi ho, dost banane nahi. Dost tumhare paas pehle se kaafi hain. Office se sirf kaam lo. Baaki sab optional hai.", tags:[]},
+      {t:"Jab koi tumhe chhota dikhane ki koshish kare, ek baat yaad rakhna: unhe koshish karni padti hai. Tumhe nahi.", tags:[]}
     ]
   },
   {
@@ -546,7 +534,10 @@ const MOODS = [
       {t:"Tum doosron ko \u201crest karo\u201d, \u201ctime se so jaya karo\u201d, \u201cdoctor ko dikhate rehna\u201d bolti ho. Aaj wahi advice khud pe lagao. Doctor Ishika ka prescription: neend.", tags:[]},
       {t:"Saturday ko bhi office, phir bhi \u201cit\u2019s fine.\u201d Aaj \u201cit\u2019s fine\u201d ko chhutti do. Thak gayi ho. Bas itna maan lo. Body baaki khud sambhal legi.", tags:[]},
       {t:"Khaana skip mat karna. Tumne mujhe bola tha, \u201cdin bhar kuch nahi? Sad.\u201d Aaj wahi line wapas. Kuch bhi kha lo. Maggi bhi chalegi.", tags:[]},
-      {t:"Aaj koi call, koi update, koi reply nahi. Jo log tumhe jaante hain, unhe pata hai kal subah \u201cme so gyi thi\u201d aayega. Woh wait kar lenge.", tags:[]}
+      {t:"Aaj koi call, koi update, koi reply nahi. Jo log tumhe jaante hain, unhe pata hai kal subah \u201cme so gyi thi\u201d aayega. Woh wait kar lenge.", tags:[]},
+      {t:"Aaj “thak gayi hu” bolna allowed hai. Bina “but” ke, bina “it’s fine” ke. Ek insaan ko bol do. Phir so jao.", tags:[]},
+      {t:"Weekend aa raha hai. Plan mat banao. Tumhare best weekend wahi hote hain jinka plan sham ko banta hai.", tags:[]},
+      {t:"Kaam kal bhi hoga. Neend aaj hai. Priority clear hai.", tags:[]}
     ]
   },
   {
@@ -561,7 +552,10 @@ const MOODS = [
       {t:"Kisi ka plan tumhari wajah se badal gaya, aur sorry bolne ka mann kar raha hai? Ruko. Jo log tumhare liye plan badalte hain, woh isliye karte hain kyunki tum worth it ho. Sorry yahan fit nahi hota.", tags:[]},
       {t:"Packing, family, kaam, ticket, sab ek saath dimaag mein? Tumne isse bade din nikaale hain. Jaipur se Kota, Kota se gaon, gaon se airport. Aaj ka bhi nikal jayega.", tags:[]},
       {t:"Jab kuch samajh na aaye toh tum ek cheez sahi karti ho: seedha bol deti ho \u201cm not good in this, help kar do.\u201d Aaj bhi maang lo. Help maangna kamzori nahi hai, tumhara skill hai.", tags:[]},
-      {t:"\u201cAccha nahi lag raha, pata nahi kyun\u201d bhi ek valid data point hai. Compliance mein gut feeling note karte hain, ignore nahi karte. Aaj note kar lo. Decide kal.", tags:[]}
+      {t:"\u201cAccha nahi lag raha, pata nahi kyun\u201d bhi ek valid data point hai. Compliance mein gut feeling note karte hain, ignore nahi karte. Aaj note kar lo. Decide kal.", tags:[]},
+      {t:"Sab kuch abhi decide nahi hota. Visa bhi last hafte hua tha, ticket bhi last din. Sab ho gaya tha. Yeh bhi ho jayega, bas order mein.", tags:[]},
+      {t:"Jab dimaag mein bahut kuch ho toh ek line likh lo: “aaj sirf yeh.” Baaki list kal ki hai. Kal wali tum use sambhal legi.", tags:[]},
+      {t:"Confusion ka matlab yeh nahi ki tum galat ho. Iska matlab hai options hain. Woh acchi problem hai.", tags:[]}
     ]
   },
   {
@@ -577,7 +571,10 @@ const MOODS = [
       {t:"Doubt tab aata hai jab cheez unfamiliar lagti hai. Itna accha hona tumhare liye nayi cheez hai, isliye ajeeb lag raha hai. Aadat padegi. Waqt do.", tags:[]},
       {t:"\u201cKuch galat toh nahi hoga na?\u201d Ho sakta hai. Har cheez mein ho sakta hai. Par tumne pichli baar bhi sambhaal liya tha, aur uske pehle bhi. Track record tumhare favour mein hai.", tags:[]},
       {t:"Naya desh, naya office, sab kuch peeche chhod ke akele aana, jab \u201cvibe nahi aa raha\u201d tha, phir bhi aayi. Yeh kismat nahi hai. Yeh himmat hai. Aur himmat walon ke saath acchi cheezein hoti hi hain.", tags:[]},
-      {t:"Mahadev ne tumhe yahan tak pahunchaya hai, aur beech raaste mein chhodne ka unka record nahi hai. Sabr tumhara kaam. Baaki unka.", tags:["faith"]}
+      {t:"Mahadev ne tumhe yahan tak pahunchaya hai, aur beech raaste mein chhodne ka unka record nahi hai. Sabr tumhara kaam. Baaki unka.", tags:["faith"]},
+      {t:"Har baar “kuch galat hoga” sochne se galat hone ke chances nahi badhte. Bas accha waqt kharab hota hai. Isliye aaj sirf accha waqt.", tags:[]},
+      {t:"Log “fishy” bolte hain kyunki unhone tumhe raat ke do baje kaam karte nahi dekha. Tumne dekha hai. Unka opinion unke paas rehne do.", tags:[]},
+      {t:"Tum maangti nahi ho, phir bhi mil raha hai. Iska matlab galti nahi hai. Iska matlab hai tumne itna kiya ki maangna nahi pada.", tags:[]}
     ]
   },
   {
@@ -593,7 +590,10 @@ const MOODS = [
       {t:"Ghar door hai, Mahadev nahi. Phone mein jo Shivji ki photo hai, ek baar dekh lo. Dubai mein bhi wahi kaam karti hai jo Kota mein karti thi.", tags:["faith"]},
       {t:"Dost tumhare paas isliye tikte hain kyunki tum unke saath wahi karti ho jo aaj tum chah rahi ho koi tumhare saath kare. Toh aaj koi karega. Bas phone uthao.", tags:[]},
       {t:"Tum kabhi kabhi bolti ho \u201cyaad aa gayi, pata nahi kyun.\u201d Ulta bhi sach hai. Log tumhe bina kisi kyun ke yaad karte hain. Aaj bhi kisi ne kiya hoga.", tags:[]},
-      {t:"Homesick hona kamzori nahi hai. Iska matlab hai ghar pe log hain jo yaad aane layak hain. Sabke paas yeh nahi hota. Tumhare paas hai, aur yeh tumhari hi banayi hui cheez hai.", tags:[]}
+      {t:"Homesick hona kamzori nahi hai. Iska matlab hai ghar pe log hain jo yaad aane layak hain. Sabke paas yeh nahi hota. Tumhare paas hai, aur yeh tumhari hi banayi hui cheez hai.", tags:[]},
+      {t:"Ghar ki yaad mein pehle khana aata hai, phir maa ka “kuch khaya?”, phir Kota ka mausam. Pehle do ek call door hain. Mausam ko chhod do, woh waise bhi Dubai se better hai.", tags:[]},
+      {t:"Dubai mein tumhara pehla dost kitne din mein bana tha? Do hafte bhi nahi. Coincidence nahi hai. Tum logon ke saath aisi hi ho.", tags:[]},
+      {t:"Ghar wahan hota hai jahan tumhare log hote hain, aur tumhare log phone mein hain. Aaj ek ko call karo, kal doosre ko. Ghar wapas aa jayega.", tags:[]}
     ]
   },
   {
@@ -609,7 +609,10 @@ const MOODS = [
       {t:"Tumhare paas ek cheez hai jo sikhai nahi jaa sakti: log tumse baat karke halka mehsoos karte hain, bina tumhare kuch khaas kiye. Aaj woh cheez khud pe use karo.", tags:[]},
       {t:"Jo ladki bina kuch maange chun li jaati hai, woh \u201ckaafi nahi hu\u201d kaise soch sakti hai? Facts tumhare against nahi hain. Bas aaj mood hai. Mood guzar jaata hai.", tags:[]},
       {t:"Tumne kabhi kisi ka ehsaan nahi liya, kabhi kisi pe bojh nahi bani. Ek cheez phir bhi seekh lo: jab koi tumhara khayal rakhe, usko bina \u201citna mat karo\u201d bole le lo. Care ka koi return policy nahi hota. Yeh loan nahi hai.", tags:[]},
-      {t:"Aaj khud pe shaq hai? Theek hai. Kal wali Ishika se poochho, jo Saturday ko office jaati hai, sabka dhyaan rakhti hai, aur phir bhi \u201cchill h sab\u201d bolti hai. Woh tum hi ho. Aaj bas thodi thaki hui.", tags:[]}
+      {t:"Aaj khud pe shaq hai? Theek hai. Kal wali Ishika se poochho, jo Saturday ko office jaati hai, sabka dhyaan rakhti hai, aur phir bhi \u201cchill h sab\u201d bolti hai. Woh tum hi ho. Aaj bas thodi thaki hui.", tags:[]},
+      {t:"Jab tum apne baare mein “kuch khaas nahi” bolti ho, jo log tumhe jaante hain woh has dete hain. Kyunki unhone dekha hai. Aaj unki nazar udhaar le lo.", tags:[]},
+      {t:"Tumhe “itsok” bolne ki aadat hai. Aaj ek line badal do: “thoda mushkil hai.” Woh bhi utni hi sach hai, aur zyada halki lagti hai.", tags:[]},
+      {t:"Tum kaafi ho. Yeh generic line nahi hai. Un logon se poochho jo tumhare “reach hoke text karna” ke baad sach mein wait karte hain.", tags:[]}
     ]
   },
   {
@@ -624,7 +627,10 @@ const MOODS = [
       {t:"Kuch accha hua aur pehla khayal \u201cpakka?\u201d aaya? Haan, pakka. Aaj sirf \u201cwow\u201d allowed hai. \u201cPakka\u201d kal ke liye.", tags:[]},
       {t:"Tum doosron ke wins pe poore dil se \u201cHappy for you 🥹\u201d bhejti ho. Aaj koi tumhe wahi bhej raha hai. Le lo. Deflect mat karo.", tags:[]},
       {t:"Tumhara ek goal hai: apni zindagi, apne dum pe. Aaj ka win us goal ka ek block hai. Block gin lo. Building ban rahi hai.", tags:[]},
-      {t:"Ghar pe batao, aur unka reaction yaad rakhna. \u201cNothing much\u201d bolke mat tal dena. Yeh unka bhi win hai.", tags:[]}
+      {t:"Ghar pe batao, aur unka reaction yaad rakhna. \u201cNothing much\u201d bolke mat tal dena. Yeh unka bhi win hai.", tags:[]},
+      {t:"Aaj thodi der ke liye “nazar lag jayegi” wali soch band. Nazar lagne se zyada bura tha khush na hona. Khush ho jao. Poori.", tags:[]},
+      {t:"Jab kuch accha hota hai toh tum sabse pehle bolti ho ki doosron ki wajah se hua. Aaj ulta karo. Ek baar bolo: meri wajah se hua.", tags:[]},
+      {t:"Kisi ko batane ka mann nahi? Chalega. Khud ko bata do, aaine mein. Yeh bhi celebration hai.", tags:[]}
     ]
   },
   {
@@ -639,7 +645,10 @@ const MOODS = [
       {t:"Agar aaj raat Mahadev yaad aa rahe hain, toh sahi time hai. Raat ki baatein wahi sabse acche se sunte hain. Ek baar naam lo, phir aankhen band.", tags:["faith"]},
       {t:"Overthinking ka peak raat 2 se 3 ke beech hota hai. Tum abhi peak pe ho. Iska ek hi fix hai: abhi kuch decide mat karo, aur phone ko charge pe laga do.", tags:[]},
       {t:"Neend nahi aa rahi? Kal ka outfit decide kar lo. Dimaag ko koi kaam do, warna woh khud kaam dhoondh lega, aur woh kaam accha nahi hoga.", tags:[]},
-      {t:"Good night bolne ke liye koi jaaga hua nahi hai? Yeh page hai. Good night, Ishika. Ab sach mein.", tags:[]}
+      {t:"Good night bolne ke liye koi jaaga hua nahi hai? Yeh page hai. Good night, Ishika. Ab sach mein.", tags:[]},
+      {t:"Raat ko sab bada lagta hai. Kaam, log, faisle. Subah wahi cheezein apni asli size mein wapas aa jaati hain. Bas subah tak ruko.", tags:[]},
+      {t:"Neend nahi aa rahi toh Shivji ka koi gaana laga lo, jo Sawan mein sunti thi. Do minute mein aankhen bhaari hongi.", tags:[]},
+      {t:"Kal subah wali tum aaj raat wali tum se zyada samajhdaar hogi. Usko decide karne do. Tum bas so jao.", tags:[]}
     ]
   },
   {
@@ -654,7 +663,10 @@ const MOODS = [
       {t:"Aaj ka message: kuch nahi. Sach mein. Yeh line yahan sirf isliye hai taaki page khaali na lage.", tags:["quiet"]},
       {t:"Tumhe pata hai tum kal theek ho jaogi. Tumne yeh khud bola hai, kai baar, aur har baar sahi nikli. Aaj bas aaj hai.", tags:["quiet"]},
       {t:"Chup rehna bhi baat karne ka ek tarika hai. Jo samajhte hain, samajh jaate hain. Yeh page samajhta hai.", tags:["quiet"]},
-      {t:"Phone ko ulta rakh do. Chhat dekho. Do minute. Bas.", tags:["quiet"]}
+      {t:"Phone ko ulta rakh do. Chhat dekho. Do minute. Bas.", tags:["quiet"]},
+      {t:"Aaj koi advice nahi. Koi “chill karo” nahi. Bas: theek hai.", tags:[]},
+      {t:"Jo bhi hai, aaj usko naam dene ki zarurat nahi. Kal shayad khud chala jaye.", tags:[]},
+      {t:"Padh liya? Bas. Ab band kar do. Kal phir.", tags:[]}
     ]
   }
 ];
@@ -678,8 +690,21 @@ function shuffle(arr, rnd = Math.random){
 }
 function moodById(id){ return MOODS.find(m => m.id === id); }
 
-/* a bag is an array of quote indices still unseen for a mood.
-   store: {get(key), set(key,val)} */
+function buildQueue(moodId, rnd = Math.random){
+  const m = moodById(moodId);
+  return shuffle(m.quotes.map((q, i) => ({ moodId, idx: i })), rnd);
+}
+function buildRandomQueue(hour, rnd = Math.random){
+  const r = moodById("random");
+  const pool = isNightHour(hour) ? r.nightPool : r.pool;
+  return shuffle(pool.flatMap(id => moodById(id).quotes.map((q, i) => ({ moodId: id, idx: i }))), rnd);
+}
+/* reshuffle without repeating the item just shown */
+function reshuffle(queue, last, rnd = Math.random){
+  const q = shuffle(queue, rnd);
+  if (q.length > 1 && last && q[0].moodId === last.moodId && q[0].idx === last.idx) q.push(q.shift());
+  return q;
+}
 function makeStore(){
   const mem = {};
   let ls = null;
@@ -688,48 +713,6 @@ function makeStore(){
     get(k){ if (ls){ try { const v = ls.getItem(k); return v == null ? null : JSON.parse(v); } catch(e){} } return k in mem ? mem[k] : null; },
     set(k,v){ if (ls){ try { ls.setItem(k, JSON.stringify(v)); return; } catch(e){} } mem[k] = v; }
   };
-}
-
-function nextIndex(moodId, store, session, rnd = Math.random){
-  const mood = moodById(moodId);
-  const n = mood.quotes.length;
-  const key = "bag:" + moodId;
-  const lastKey = "last:" + moodId;
-  let bag = store.get(key);
-  if (!Array.isArray(bag) || bag.some(i => typeof i !== "number" || i < 0 || i >= n)) bag = [];
-  bag = bag.filter(i => i >= 0 && i < n);
-  if (bag.length === 0){
-    bag = shuffle([...Array(n).keys()], rnd);
-    const last = store.get(lastKey);
-    if (n > 1 && bag[0] === last){ bag.push(bag.shift()); }
-  }
-  /* session rules: pick first eligible in bag, else first */
-  const eligible = i => {
-    const tags = mood.quotes[i].tags || [];
-    if (tags.includes("joke") && session.joke) return false;
-    if (tags.includes("faith") && session.faith) return false;
-    if (tags.includes("stay") && session.quiet) return false;
-    if (tags.includes("quiet") && session.stay) return false;
-    return true;
-  };
-  let pos = bag.findIndex(eligible);
-  if (pos < 0) pos = 0;
-  const idx = bag[pos];
-  bag.splice(pos, 1);
-  store.set(key, bag);
-  store.set(lastKey, idx);
-  const tags = mood.quotes[idx].tags || [];
-  if (tags.includes("joke")) session.joke = true;
-  if (tags.includes("faith")) session.faith = true;
-  if (tags.includes("stay")) session.stay = true;
-  if (tags.includes("quiet")) session.quiet = true;
-  return idx;
-}
-
-function pickRandomMood(rnd = Math.random, hour = new Date().getHours()){
-  const r = moodById("random");
-  const pool = isNightHour(hour) ? r.nightPool : r.pool;
-  return pool[Math.floor(rnd() * pool.length)];
 }
 
 function greeting(d){
@@ -754,8 +737,7 @@ if (typeof document !== "undefined"){
 try {
   const $ = id => document.getElementById(id);
   const store = makeStore();
-  const session = { joke:false, faith:false, stay:false, quiet:false };
-  let current = { moodId:null, shown:0 };
+  let current = { items:[], pos:0, label:"", last:null };
 
   /* theme */
   const html = document.documentElement;
@@ -813,35 +795,38 @@ try {
     b.type = "button";
     b.className = "mood" + (m.random ? " random" : "");
     b.innerHTML = `<span class="em" aria-hidden="true">${m.em}</span><span>${m.label}</span>`;
-    b.addEventListener("click", () => open(m.random ? pickRandomMood() : m.id, m.random));
+    b.addEventListener("click", () => open(m.id, m.random));
     li.appendChild(b); ul.appendChild(li);
   });
 
-  function render(moodId, fromRandom){
-    const mood = moodById(moodId);
-    const idx = nextIndex(moodId, store, session);
-    $("qlabel").textContent = fromRandom ? "Random dose" : mood.label;
+  function paint(){
+    const it = current.items[current.pos];
+    const mood = moodById(it.moodId);
+    $("qlabel").textContent = current.label;
     const q = $("quote");
     q.classList.remove("enter"); void q.offsetWidth;
-    q.textContent = mood.quotes[idx].t;
+    q.textContent = mood.quotes[it.idx].t;
     q.classList.add("enter");
-    current.shown++;
-    const done = current.shown >= MAX_PER_SESSION;
-    $("moreBtn").disabled = done;
-    if (done) $("closeNote").textContent = CLOSE_NOTES[Math.floor(Math.random() * CLOSE_NOTES.length)];
-    $("closeNote").hidden = !done;
+    current.last = it;
   }
   function open(moodId, fromRandom){
-    current = { moodId, shown:0, fromRandom:!!fromRandom };
-    $("closeNote").hidden = true;
+    current = {
+      items: fromRandom ? buildRandomQueue(new Date().getHours()) : buildQueue(moodId),
+      pos: 0,
+      label: fromRandom ? "Random dose" : moodById(moodId).label,
+      last: null
+    };
     setTextMe(moodId);
     show("quoteScreen");
-    render(moodId, fromRandom);
+    paint();
   }
   $("moreBtn").addEventListener("click", () => {
-    if (current.shown >= MAX_PER_SESSION) return;
-    const id = current.fromRandom ? pickRandomMood() : current.moodId;
-    render(id, current.fromRandom);
+    current.pos++;
+    if (current.pos >= current.items.length){
+      current.items = reshuffle(current.items, current.last);
+      current.pos = 0;
+    }
+    paint();
   });
   $("backBtn").addEventListener("click", () => show("home"));
 
