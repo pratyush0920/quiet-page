@@ -12,15 +12,15 @@
 <style>
   :root{
     --navy:#16223A;
-    --navy-2:#1F2D4A;
+    --navy-2:#1E2B47;
     --sand:#E8DDC6;
     --sand-2:#D9CBAE;
     --sun:#E0A93A;
-    --sun-2:#B8862A;
-    --mist:#DDE3E6;
-    --paper:#F6F3EC;
-    --ink:var(--navy);
-    --ink-soft:#4B566B;
+    --sun-2:#A87A24;
+    --mist:#E7E3D9;
+    --paper:#FBF8F1;
+    --ink:#14161C;
+    --ink-soft:#5A5F6B;
     --bg:var(--mist);
     --surface:var(--paper);
     --line:rgba(22,34,58,.14);
@@ -32,16 +32,18 @@
   }
   html[data-theme="night"]{
     --ink:var(--sand);
-    --ink-soft:#B9AF9B;
+    --ink-soft:#ACA79A;
     --bg:var(--navy);
     --surface:var(--navy-2);
-    --line:rgba(232,221,198,.16);
+    --line:rgba(232,221,198,.15);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;
-    background:var(--bg);
+    background:
+      radial-gradient(120% 70% at 50% -10%, rgba(255,255,255,.55), transparent 60%),
+      var(--bg);
     color:var(--ink);
     font-family:var(--font-sans);
     font-size:17px;
@@ -128,15 +130,16 @@
     font-weight:500;
     font-size:16px;
     line-height:1.3;
-    min-height:64px;
+    min-height:66px;
     display:flex;
     align-items:center;
-    gap:10px;
-    transition:transform .18s ease, border-color .18s ease;
+    gap:11px;
+    box-shadow:0 1px 0 rgba(20,22,28,.03);
+    transition:transform .18s ease, border-color .18s ease, box-shadow .2s ease;
   }
   .mood:active{transform:scale(.97)}
   @media (hover:hover){
-    .mood:hover{border-color:var(--sun)}
+    .mood:hover{border-color:var(--sun);box-shadow:0 6px 18px -12px rgba(20,22,28,.4)}
   }
   .mood .em{font-size:20px;line-height:1;flex:none;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
   .mood.random{
@@ -149,78 +152,70 @@
   }
   .mood.random:hover{border-color:transparent}
 
-  /* quote screen */
-  .qwrap{
-    position:relative;
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    padding:8px 0 24px;
-    min-height:60dvh;
+  /* quote sheet */
+  .sheet{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center}
+  .sheet[hidden]{display:none}
+  .sheet-backdrop{
+    position:absolute;inset:0;
+    background:rgba(20,22,28,.34);
+    backdrop-filter:blur(3px);
+    opacity:0;transition:opacity .3s ease;
   }
-  .qhold{position:relative;margin-top:64px}
-  .sunflower{
-    position:absolute;
-    right:-34px;
-    top:-92px;
-    width:min(40vw, 168px);
-    height:min(40vw, 168px);
-    z-index:1;
-    pointer-events:none;
-    animation:turn 140s linear infinite;
-    transform-origin:50% 50%;
-    filter:drop-shadow(0 8px 14px rgba(22,34,58,.18));
-  }
-  @keyframes turn{to{transform:rotate(360deg)}}
-  .qcard{
+  html[data-theme="night"] .sheet-backdrop{background:rgba(6,9,16,.55)}
+  .sheet.in .sheet-backdrop{opacity:1}
+  .sheet-card{
     position:relative;
+    width:min(34rem,100%);
+    margin:0 12px calc(12px + env(safe-area-inset-bottom));
     background:var(--surface);
     border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:30px 24px 24px;
-    padding-right:28px;
-    box-shadow:0 20px 50px -30px rgba(22,34,58,.35);
+    border-radius:26px;
+    padding:26px 22px 18px;
+    box-shadow:0 30px 70px -34px rgba(20,22,28,.55);
+    transform:translateY(16px);opacity:0;
+    transition:transform .34s cubic-bezier(.2,.8,.25,1),opacity .28s ease;
+    touch-action:pan-y;
   }
-  html[data-theme="night"] .qcard{box-shadow:0 20px 50px -30px rgba(0,0,0,.6)}
-  .qlabel{
-    font-size:14px;
-    color:var(--ink-soft);
-    margin:0 0 16px;
+  .sheet.in .sheet-card{transform:none;opacity:1}
+  .sheet.out .sheet-card{transform:translateY(22px);opacity:0}
+  @media (min-width:620px){
+    .sheet{align-items:center}
+    .sheet-card{margin-bottom:0;padding:32px 30px 22px}
+  }
+  .sheet-sun{
+    position:absolute;top:-40px;right:-14px;width:92px;height:92px;
+    animation:turn 140s linear infinite;transform-origin:50% 50%;
+    filter:drop-shadow(0 8px 14px rgba(20,22,28,.22));pointer-events:none;
+  }
+  @keyframes turn{to{transform:rotate(360deg)}}
+  .sheet-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .qlabel{font-size:13.5px;color:var(--ink-soft);margin:0 0 14px;padding-right:60px}
+  .sheet-x{
+    width:34px;height:34px;flex:none;margin-top:-6px;border-radius:50%;
+    border:1px solid var(--line);color:var(--ink-soft);font-size:19px;line-height:1;
+    display:grid;place-items:center;
   }
   .quote{
     font-family:var(--font-serif);
     font-variation-settings:"SOFT" 100, "opsz" 40;
-    font-style:italic;
-    font-weight:400;
-    font-size:clamp(23px, 6vw, 28px);
-    line-height:1.32;
-    margin:0;
-    letter-spacing:-.005em;
-    text-wrap:pretty;
+    font-style:italic;font-weight:400;
+    font-size:clamp(21px, 5.4vw, 26px);
+    line-height:1.36;margin:0;letter-spacing:-.005em;text-wrap:pretty;
   }
-  .quote.enter{animation:rise .55s cubic-bezier(.2,.7,.2,1) both}
-  @keyframes rise{
-    from{opacity:0;transform:translateY(10px)}
-    to{opacity:1;transform:none}
-  }
-  .actions{
-    display:flex;
-    gap:10px;
-    margin-top:26px;
-  }
+  .quote.enter{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .sheet-foot{display:flex;align-items:center;gap:14px;margin-top:24px}
+  .dwell{flex:1;height:2px;border-radius:999px;background:var(--line);overflow:hidden}
+  .dwell i{display:block;height:100%;width:100%;background:var(--sun);transform-origin:left center;transform:scaleX(1)}
   .btn{
-    flex:1;
-    padding:14px 16px;
-    border-radius:999px;
-    font-weight:600;
-    font-size:15px;
-    border:1px solid var(--line);
-    background:transparent;
+    padding:11px 18px;border-radius:999px;font-weight:600;font-size:14.5px;
+    border:1px solid var(--line);background:transparent;
     transition:transform .18s ease, background .2s ease, opacity .2s;
   }
   .btn:active{transform:scale(.97)}
-  .btn.primary{background:var(--ink);color:var(--bg);border-color:transparent}
+  .btn.primary{background:var(--ink);color:var(--paper);border-color:transparent}
+  .btn.ghost{flex:none;background:var(--surface)}
+  @media (hover:hover){ .btn.ghost:hover{border-color:var(--sun)} }
   .btn[disabled]{opacity:.35;cursor:default}
 
   .textme{
@@ -265,6 +260,40 @@
     margin-top:4px;
   }
   .eyes-link:active{transform:scale(.98)}
+  .eyes-link.month{
+    border-color:var(--line);
+    border-left:4px solid var(--sand-2);
+    background:var(--surface);
+  }
+  @media (hover:hover){ .eyes-link.month:hover{background:rgba(217,203,174,.25)} }
+  html[data-theme="night"] .eyes-link.month{border-left-color:var(--sun-2)}
+  .letter.month{border-color:var(--line)}
+  .song{
+    display:flex;align-items:center;gap:13px;
+    margin:6px 0 22px;padding:14px 16px;
+    border:1px solid rgba(224,169,58,.45);
+    border-radius:16px;
+    background:rgba(224,169,58,.1);
+    text-decoration:none;color:inherit;
+    transition:background .2s ease, transform .18s ease;
+  }
+  .song:active{transform:scale(.985)}
+  @media (hover:hover){ .song:hover{background:rgba(224,169,58,.18)} }
+  .song .note-ic{
+    width:38px;height:38px;flex:none;border-radius:50%;
+    display:grid;place-items:center;
+    border:1px solid rgba(224,169,58,.6);
+    color:var(--sun-2);font-size:16px;
+  }
+  html[data-theme="night"] .song .note-ic{color:var(--sun)}
+  .song b{
+    display:block;font-family:var(--font-serif);
+    font-variation-settings:"SOFT" 100, "opsz" 20;
+    font-weight:400;font-size:18px;line-height:1.2;
+  }
+  .song small{display:block;font-family:var(--font-sans);font-size:13.5px;color:var(--ink-soft);margin-top:3px}
+  .letter.month .letter-sub,.letter.month .letter-end{border-color:var(--line)}
+  .letter.month .letter-end{color:var(--ink-soft)}
   @media (hover:hover){ .eyes-link:hover{background:rgba(224,169,58,.2)} }
 
   .letter{
@@ -410,26 +439,26 @@
     <p class="sub">One tap. One line. No reply needed.</p>
     <ul class="moods" id="moods"></ul>
     <button class="eyes-link" id="eyesBtn" type="button">Meri aankhon se<small>Things I never said. Read when you have a minute.</small></button>
+    <button class="eyes-link month" id="monthBtn" type="button">One month.<small>A short note, a month after Dubai. No reply needed.</small></button>
     <p class="foot">No read receipts. No last seen. Nobody can see what you tapped.<br><a class="textme" href="#" target="_blank" rel="noopener" data-textme><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 0 1 0 16.4c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8zm-3 4.4c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3l-2-.9c-.3-.1-.5-.2-.7.2l-.9 1.1c-.2.2-.3.2-.6.1a6.8 6.8 0 0 1-3.4-3c-.3-.4 0-.5.2-.8l.6-.8c.1-.2 0-.4 0-.6l-.9-2.2c-.2-.5-.4-.5-.6-.5H9z"/></svg><span>Text me. No reason needed.</span></a></p>
   </section>
 
-  <!-- quote -->
-  <section class="screen" id="quoteScreen" aria-label="Message">
-    <div class="qwrap">
-     <div class="qhold">
-      <svg class="sunflower" viewBox="0 0 200 200" aria-hidden="true"><use href="#sunflowerShape"/></svg>
-      <div class="qcard">
+  <!-- quote sheet -->
+  <div class="sheet" id="sheet" hidden aria-hidden="true">
+    <div class="sheet-backdrop" id="sheetBackdrop"></div>
+    <div class="sheet-card" id="sheetCard" role="dialog" aria-modal="true" aria-label="Message">
+      <svg class="sheet-sun" viewBox="0 0 200 200" aria-hidden="true"><use href="#sunflowerShape"/></svg>
+      <div class="sheet-top">
         <p class="qlabel" id="qlabel"></p>
-        <p class="quote" id="quote" aria-live="polite"></p>
-        <div class="actions">
-          <button class="btn" id="backBtn" type="button">Back</button>
-          <button class="btn primary" id="moreBtn" type="button">Next</button>
-        </div>
+        <button class="sheet-x" id="sheetClose" type="button" aria-label="Close">&#215;</button>
       </div>
-     </div>
+      <p class="quote" id="quote" aria-live="polite"></p>
+      <div class="sheet-foot">
+        <span class="dwell" aria-hidden="true"><i id="dwellBar"></i></span>
+        <button class="btn ghost" id="moreBtn" type="button">One more</button>
+      </div>
     </div>
-    <p class="foot">Made for the bad days. Works on the good ones too.<br><a class="textme" href="#" target="_blank" rel="noopener" data-textme><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 0 1 0 16.4c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8zm-3 4.4c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3l-2-.9c-.3-.1-.5-.2-.7.2l-.9 1.1c-.2.2-.3.2-.6.1a6.8 6.8 0 0 1-3.4-3c-.3-.4 0-.5.2-.8l.6-.8c.1-.2 0-.4 0-.6l-.9-2.2c-.2-.5-.4-.5-.6-.5H9z"/></svg><span>Text me. No reason needed.</span></a></p>
-  </section>
+  </div>
 
   <!-- meri aankhon se -->
   <section class="screen" id="eyes" aria-label="Meri aankhon se">
@@ -451,6 +480,41 @@
       <p class="letter-end">Yeh sab maine kabhi bola nahi. Ab likh diya. Jab bhi khud pe shaq ho, yahan aa jana. Yeh page nahi badlega.</p>
     </div>
     <div class="eyes-actions"><button class="btn" id="eyesBack" type="button">Back</button></div>
+  </section>
+
+  <!-- one month -->
+  <section class="screen" id="month" aria-label="One month">
+    <div class="letter month" id="monthLetter">
+      <svg class="letter-sun" viewBox="0 0 200 200" aria-hidden="true"><use href="#sunflowerShape"/></svg>
+      <h1 class="letter-head">One month.</h1>
+      <p class="letter-sub">15 August to 15 September. No gyaan this time. Just a few things worth saying properly.</p>
+
+      <a class="song" href="https://open.spotify.com/search/Kabira%20Encore%20Yeh%20Jawaani%20Hai%20Deewani" target="_blank" rel="noopener noreferrer">
+        <span class="note-ic" aria-hidden="true">&#9834;</span>
+        <span><b>Kabira, Encore</b><small>Naina's song. Put it on while you read this.</small></span>
+      </a>
+
+      <p>A month ago you walked through that gate without turning around. I noticed. Most people turn around once.</p>
+
+      <p>Thirty days later you are working Saturdays, fighting with your laptop, telling me which shades work and which do not, and generally getting on with it. Living there, not waiting there. That was the only part I was unsure about, and you settled it in about two weeks.</p>
+
+      <p>There was one day you were not well. You said sab theek hai and went to office the next morning. I am not going to lecture you about it. Only this: “thoda theek nahi hai” is a complete sentence. You are not required to attach the second half.</p>
+
+      <p>You sent something for my birthday and called it nothing before I had even opened the box. It was the exact shade of white I had been hunting for weeks. So either our choices are not as different as you keep claiming, or you pay much closer attention than you admit. I would bet on the second one.</p>
+
+      <p>You do this often, by the way. You do something thoughtful and then discount it in the same breath, like there is a bill somewhere you are trying not to run up. There is no bill. Nobody is keeping accounts with you.</p>
+
+      <p>In August I told you I wanted you around, and you replied with three words. I am always here. That was enough. I have not asked for anything more since, and I am not asking now.</p>
+
+      <p>At the airport you told me to focus on my own things and stop being sweet to everybody. I took the first half seriously. New job, new office, first day went fine, and your all the best landed before anyone else's. The second half is still under review.</p>
+
+      <p>So, one month. You did it on your own, which is exactly how you said you wanted to do it. Nothing on this page needs a reply. It is here so that on a bad day, when your brain starts arguing that you are too much or not enough or somehow both at once, there is something in writing that disagrees.</p>
+
+      <p>You once told me you see yourself in Naina. I get it. She spends the first half of that film convinced she is the boring one in the room, and the whole time she is the only person actually paying attention. Everyone else is performing. Then she goes on one trip she nearly talked herself out of, and it changes the shape of her life. You did the same thing in August, except yours involved a visa and a job offer. Put the song on if you want the full effect.</p>
+
+      <p class="letter-end">Still Dora. Now with a work visa.<br><br>Pratush.<br><span style="font-style:normal;font-size:15px">(Haan. Ab yahi naam hai.)</span></p>
+    </div>
+    <div class="eyes-actions"><button class="btn" id="monthBack" type="button">Back</button></div>
   </section>
 
 </div>
@@ -487,25 +551,32 @@ const MOODS = [
   {
     id:"bore", em:"🥱", label:"Bored",
     quotes:[
+      {t:"Naina ki tarah plan ka wait mat karo. Uske paas bhi koi plan nahi tha, bas ek trek tha aur ek haan.", tags:[]},
+      {t:"Aaj ka kaam: ek gaana dhoondho jo tumne kabhi nahi suna. Bas ek. Baaki din apne aap chal jayega.", tags:[]},
+      {t:"Bore hona ka matlab hai aaj koi emergency nahi hai. Yeh ek acchi khabar hai, thodi boring packaging mein.", tags:[]},
+      {t:"Koi purani photo dhoondho jisme tum hass rahi ho bina camera dekhe. Woh wali. Usko dekh lo.", tags:[]},
+      {t:"Ek kaam jo tum tal rahi ho, woh sirf sat minute ka hai. Timer laga lo. Aadha bhi ho gaya toh jeet.", tags:[]},
       {t:"Official update: tees baar \u201cPratush\u201d padhne ke baad maine haar maan li hai. Ab wahi naam hai. Documents bhi change karwa raha hu.", tags:["joke"]},
       {t:"Tum woh insaan ho jo bolti hai \u201cI don\u2019t like to cook\u201d, aur phir daal baati, rajma chawal, sev tamatar, aalu paratha ki list ek saans mein bhej deti hai. Khana pasand hai, banana nahi. Fully valid.", tags:["joke"]},
       {t:"Fun fact: maine ek baar tumhe \u201cTuk Tuk\u201d naam diya tha. Pata chala woh tumhari bhabhi ka naam hai. Tab se mera nickname department permanently band hai.", tags:["joke"]},
       {t:"Bore ho rahi ho? Tumhara hi formula hai: baat karte karte rasta kat jaata hai. Kisi ko call karo. Jo phone uthaye, wahi aaj ka lucky insaan.", tags:[]},
       {t:"Gossip sunke tumhe neend aati hai. Toh aaj ka plan simple hai. Kisi ka gossip suno, so jao. Do kaam ek saath.", tags:[]},
       {t:"Tumhari ek \u201cChill mode\u201d playlist hai jo, tumhare hi words mein, kaafi time se update nahi hui. Aaj usme ek gaana daal do. Yeh bhi productivity hai.", tags:[]},
-      {t:"Boredom ka tumhara ilaaj hamesha ek hi raha hai: shopping. Cart bharo, phir aadha \u201cisko next time ke liye rakh diya\u201d bolke nikaal do. Dono hisson mein mazaa hai.", tags:[]},
-      {t:"Aaj fit check ka din hai. Koi bhi outfit, koi bhi mirror. Photo kisi ko bhejni zaroori nahi. Bas khud dekh lo ki tum aaj bhi sorted lag rahi ho.", tags:[]},
+      {t:"Aaj koi bhi outfit, koi bhi mirror. Photo kisi ko bhejni zaroori nahi. Bas khud ek baar dekh lo.", tags:[]},
       {t:"Tum gossip se bore hoti ho, meetings se bore hoti ho, khaali din se bore hoti ho. Sirf ek cheez se kabhi bore nahi hoti: baatein. Toh kisi ko pakdo aur shuru ho jao.", tags:[]},
       {t:"\u201cKahi bhi chale gaye, kahi bhi baith gaye, kuch bhi kar liya.\u201d Tumhare best din aise hi hote hain, bina plan ke. Aaj bhi koi plan mat banao. Bas nikal jao.", tags:[]},
-      {t:"Gallery mein woh white dress aur sunflowers wali photos dhoondho. Jo insaan un photos mein hai, usko bore hone ka haq nahi hai.", tags:[]},
       {t:"Tumne bola tha painting pasand hai, par karti nahi. Aaj koi bhi aadhi-adhoori cheez shuru kar do. Poori karna zaroori nahi. Shuru karna hi scene hai.", tags:[]},
-      {t:"Bore ho? Ek fancy si jagah dhoondho, akele jao, coffee lo, aur logon ko dekho. Tumhe aesthetic jagah pasand hai, tumne khud bola tha. Dubai mein kami nahi hai.", tags:[]},
+      {t:"Bore ho? Koi acchi si jagah dhoondho, akele jao, aur logon ko dekho. Tumhe aisi jagah pasand hai, tumne khud bola tha. Dubai mein kami nahi hai.", tags:[]},
       {t:"Ek aur baar YJHD dekh lo. Haan, pata hai, dekhi hui hai. Isi liye toh chalti hai.", tags:[]}
     ]
   },
   {
     id:"office", em:"🙄", label:"Office people",
     quotes:[
+      {t:"Office ke logon ko tumhara poora din nahi dikhta. Unhe sirf woh dikhta hai jo tum bacha ke deti ho. Tumhara best version unka haq nahi hai.", tags:[]},
+      {t:"Aaj kisi meeting mein tum chup rahi, aur baad mein laga bol deti toh accha hota? Chup rehna bhi ek reply hai. Woh bhi count hota hai.", tags:[]},
+      {t:"Naya office, naye log, nayi politics. Teen mahine lagte hain kisi bhi jagah ko samajhne mein. Tumhara ek hua hai. Khud ko time do.", tags:[]},
+      {t:"Jo kaam tumne aaj kiya, usko koi note nahi karega. Tum kar lo. Yahi kaafi hai filhal.", tags:[]},
       {t:"Tumhe sugar coating pasand nahi, toh seedha bolta hu. Aaj ka din bekaar tha. Tum nahi.", tags:[]},
       {t:"Log tumhare baare mein baat kar rahe hain? Matlab tum unke din ka sabse interesting hissa ho. Tum apna din apne kaam pe lagao. Woh unse bhi interesting hai.", tags:[]},
       {t:"Tumhe gossip sunke neend aati hai, aur ab log tumhare baare mein gossip kar rahe hain. Irony ki bhi ek limit hoti hai. Unhe unka kaam karne do, tum apna karo.", tags:[]},
@@ -525,6 +596,10 @@ const MOODS = [
   {
     id:"battery", em:"🔋", label:"Battery 1%",
     quotes:[
+      {t:"Charging ka matlab hai kuch der ke liye kisi kaam ka na hona. Phone ke saath toh maan lete ho. Khud ke saath bhi maan lo.", tags:[]},
+      {t:"Aaj ka poora to-do list: khana, paani, neend. Teeno ho gaye toh din successful tha.", tags:[]},
+      {t:"Thakaan ka matlab yeh nahi ki tum kam kar rahi ho. Iska matlab hai tumne zyada kar liya.", tags:[]},
+      {t:"Kal subah ki chinta kal subah wali Ishika karegi. Woh kaafi capable hai. Usko uska kaam karne do.", tags:[]},
       {t:"Aaj koi target nahi. Kuch khao, paani piyo, aur beech mein neend aa jaye toh \u201cme so gyi thi\u201d kal subah bol dena. Tumhari specialty hai, koi judge nahi karega.", tags:["joke"]},
       {t:"Dubai mein sab milta hai, bas \u201cnamkeen sabke saath\u201d wali feeling nahi. Aaj dinner jo bhi ho, upar se thoda namkeen daal dena. Isko therapy maana jayega.", tags:[]},
       {t:"\u201cKuch nahi, thik h sab\u201d wala mode chal raha hai? Chalega. Bas ek chhota kaam: kuch kha lo. Baaki sab kal ka.", tags:[]},
@@ -543,6 +618,10 @@ const MOODS = [
   {
     id:"overwhelmed", em:"😵‍💫", label:"Can\u2019t figure anything out",
     quotes:[
+      {t:"Naina ne bhi ek raat mein poori life decide nahi ki thi. Bas ek bag pack kiya tha. Aaj bas ek cheez uthao.", tags:[]},
+      {t:"Sab kuch urgent lag raha hai? Ek list banao aur har cheez ke aage likho: aaj, is hafte, ya kabhi nahi. Teesri category sabse lambi niklegi.", tags:[]},
+      {t:"Jab kuch samajh na aaye toh woh karo jo tumhe aata hai: kisi ko phone karke bol do ki samajh nahi aa raha. Tumne yeh pehle bhi kiya hai, aur kaam bana hai.", tags:[]},
+      {t:"Dimaag mein bees cheezein hain aur teen hi asli hain. Baaki satrah ne bas aawaz tez kar li hai.", tags:[]},
       {t:"Plans badalne ke liye sorry mat bolo. Jo tumhe jaante hain unhe pata hai tumhare plans weather forecast ki tarah har ghante update hote hain. Phir bhi sab wait karte hain. Kabhi socha kyun?", tags:[]},
       {t:"Overthinking ka ek rule: raat 1 baje ke baad aaye thoughts ki koi legal validity nahi hoti. Compliance wali ho, unverified cheez pe action nahi lete. Subah dobara check karna.", tags:[]},
       {t:"Tumhari flights hamesha last moment pe book hoti hain, aur tum hamesha pahunch jaati ho. Aaj ka confusion bhi usi category ka hai. Pahunch jaogi.", tags:[]},
@@ -561,6 +640,9 @@ const MOODS = [
   {
     id:"toogood", em:"🫣", label:"Too good to be true?",
     quotes:[
+      {t:"Log tumhari life ko luck bolte hain kyunki unhone highlights dekhe hain, raat ke do baje wale hisse nahi.", tags:[]},
+      {t:"Naina ne bhi socha hoga ki woh trip pe jaakar galti kar rahi hai. Film ka aadha hissa uske us faisle pe khada hai.", tags:[]},
+      {t:"Accha waqt tumhe test karne nahi aaya hai. Kabhi kabhi woh bas aa jaata hai, bina sharton ke.", tags:[]},
       {t:"Legal and Compliance Officer ho yaar. Poora din doosron ka fine print check karti ho. Ek baar apni life ka bhi audit kar lo: unhone tumhe khud chuna, tumhe ek word bolna bhi nahi pada. Verdict: genuine. No red flags.", tags:[]},
       {t:"Tumhara hi rule hai: whatever happens, it\u2019s good. Chhoti si request hai. Yeh rule acchi cheezon pe bhi laga do. Sirf bure din ke liye nahi banaya tha.", tags:[]},
       {t:"Tumne hi reel bheji thi: sabr rakho, sab dikhega. Aaj sabr wala part tumhara hai. Dikhane wala department Mahadev sambhal lenge.", tags:["faith"]},
@@ -580,10 +662,14 @@ const MOODS = [
   {
     id:"home", em:"🏡", label:"Missing my people",
     quotes:[
-      {t:"Tumhari natural smile tab aati hai jab dost aas paas hon, yeh tumne khud bataya tha. Record dekho: Mumbai mein Barbies, Kota mein poori gang. Tum dost collect karti ho. Yahan bhi ho jayega, bas thoda time.", tags:[]},
-      {t:"Ghar ki yaad aa rahi hai toh maa ko ek call kar lo. Unka ek \u201ckuch khaya?\u201d is page ke saare messages se zyada kaam karega. Main bura nahi maanunga.", tags:[]},
-      {t:"Tum sabko polite exit deti ho: \u201caapke plans hain toh aap jao.\u201d Phir bhi jo log ruk jaate hain, kabhi unhe gin lena. List lambi niklegi.", tags:["stay"]},
-      {t:"Kota ki gang, Mumbai ki Barbies, ab Dubai ka naya group. Har jagah tum wahi kaam karti ho: log jod leti ho. Yaad aana normal hai. Akela hona tumse hota hi nahi.", tags:[]},
+      {t:"Ghar ki yaad aana matlab tumne kahin kuch accha banaya tha jo chhod ke aana pada. Yeh loss nahi hai. Yeh proof hai.", tags:[]},
+      {t:"Naina ne bhi ghar chhoda, ghoomi, aur wapas aayi. Dono cheezein ek saath sach ho sakti hain: yahan rehna aur wahan se juda rehna.", tags:[]},
+      {t:"Kisi ko aaj bina matlab ke message kar do. Woh sochega din bhar ki tumne kyun kiya. Yeh tumhara favourite kaam hai.", tags:[]},
+      {t:"Jo log tumse door hain, woh bhi aaj kisi na kisi point pe tumhe yaad kar rahe honge. Yeh ek tarfa nahi hota.", tags:[]},
+      {t:"Tumhari natural smile tab aati hai jab dost aas paas hon, yeh tumne khud bataya tha. Record dekho: Mumbai mein Barbies, Kota mein poori gang. Tum log jod leti ho, har jagah. Yeh tumhare saath jaata hai, kisi shehar mein chhutta nahi.", tags:[]},
+      {t:"Ghar ki yaad aa rahi hai toh maa ko ek call kar lo. Unka ek \u201ckuch khaya?\u201d is page ke saare messages se zyada kaam karega.", tags:[]},
+      {t:"Tum sabko polite exit deti ho: \u201caapke plans hain toh aap jao.\u201d Phir bhi log rukte hain. Yeh unke baare mein nahi, tumhare baare mein kuch batata hai.", tags:["stay"]},
+      {t:"Kota ki gang, Mumbai ki Barbies. Jahan bhi rahi ho, log tumhare aas paas tik jaate hain. Yaad aana normal hai. Yeh uska ulta nahi hai.", tags:[]},
       {t:"Ghar ki yaad mein sabse pehle khana yaad aata hai. Aaj sev tamatar ya rajma chawal dhoondh lo, ya khud bana lo. Haan, pata hai, cooking pasand nahi. Ek din ki baat hai.", tags:[]},
       {t:"Jo log tumhe miss kar rahe hain, unki list tumse lambi hai. Unme se kisi ek ko random call kar do. \u201cEse hi kiya\u201d bolna allowed hai.", tags:[]},
       {t:"Ghar se door hoke tum ek cheez acche se seekh gayi ho: \u201cReached\u201d bhejna. Aaj ulta karo. Ghar walon se poochho \u201ckaise ho?\u201d Unka din ban jayega, aur tumhara bhi.", tags:[]},
@@ -592,13 +678,16 @@ const MOODS = [
       {t:"Tum kabhi kabhi bolti ho \u201cyaad aa gayi, pata nahi kyun.\u201d Ulta bhi sach hai. Log tumhe bina kisi kyun ke yaad karte hain. Aaj bhi kisi ne kiya hoga.", tags:[]},
       {t:"Homesick hona kamzori nahi hai. Iska matlab hai ghar pe log hain jo yaad aane layak hain. Sabke paas yeh nahi hota. Tumhare paas hai, aur yeh tumhari hi banayi hui cheez hai.", tags:[]},
       {t:"Ghar ki yaad mein pehle khana aata hai, phir maa ka “kuch khaya?”, phir Kota ka mausam. Pehle do ek call door hain. Mausam ko chhod do, woh waise bhi Dubai se better hai.", tags:[]},
-      {t:"Dubai mein tumhara pehla dost kitne din mein bana tha? Do hafte bhi nahi. Coincidence nahi hai. Tum logon ke saath aisi hi ho.", tags:[]},
       {t:"Ghar wahan hota hai jahan tumhare log hote hain, aur tumhare log phone mein hain. Aaj ek ko call karo, kal doosre ko. Ghar wapas aa jayega.", tags:[]}
     ]
   },
   {
     id:"doubt", em:"🪞", label:"Not feeling myself",
     quotes:[
+      {t:"Naina ko poori film lagti rahi ki woh kamre mein sabse boring insaan hai. Dekhne wale sab jaante the ki woh sabse zyada dhyaan dene wali thi. Tumhare saath bhi wahi ho raha hai.", tags:[]},
+      {t:"Aaj khud ke baare mein jo bhi soch rahi ho, woh aankhon se aa raha hai jo thaki hui hain. Thake hue log accha judge nahi kar paate. Kal dobara dekhna.", tags:[]},
+      {t:"Tum log ko choose karti ho, cheezein choose karti ho, gifts choose karti ho, sab sahi. Sirf khud ko rate karte waqt tumhara scale galat ho jata hai.", tags:[]},
+      {t:"Ek insaan ko puchh ke dekho ki tumhari kaunsi baat unhe pasand hai. Jawaab tumhare andaaze se alag hoga.", tags:[]},
       {t:"Sabko \u201creach hoke text karna\u201d bolna. Har kisi se \u201ckuch toh khaoge?\u201d poochna. Kisi ke liye itne dhyaan se gift chunna ki shade aur fit dono perfect aayein. Aur phir bolna \u201cthis is nothing.\u201d Ishika, dictionary mein nothing ka matlab kuch aur hota hai.", tags:[]},
       {t:"\u201cKuch nahi chahiye\u201d tumhara default answer hai. Default hai, zaroori nahi ki sahi ho. Aaj ek cheez sirf apne liye kar lo, bina koi reason dhoondhe.", tags:[]},
       {t:"Jo ladki doosron ke liye shade, fabric aur fit itna sahi chun leti hai, uska apna mirror galat nahi ho sakta. Aaj woh pehno jisme comfortable ho. Beige, black, grey, navy ne aaj tak kisi ko dhoka nahi diya.", tags:[]},
@@ -618,11 +707,14 @@ const MOODS = [
   {
     id:"win", em:"🥳", label:"Something good happened",
     quotes:[
+      {t:"Aaj wali khushi ko kisi aur ke reaction ka intezaar mat karwao. Pehle khud ko de do.", tags:[]},
+      {t:"Naina ne apni trip ki tasveerein kisi ko dikhane ke liye nahi li thi. Kuch cheezein sirf tumhare liye hoti hain. Yeh waali bhi.", tags:[]},
+      {t:"Chhoti jeet ko chhota mat bolo. Saal ke end mein yehi chhoti cheezein list banati hain.", tags:[]},
       {t:"Fresher. Six months mein promotion. Phir Dubai, jahan unhone tumhe khud chuna, bina tumhare kuch maange. Koi isko luck bole toh wahi line maar dena jo tumne mujhe boli thi: it\u2019s all hard work, man.", tags:[]},
       {t:"Kuch accha hua? Pehle screenshot lo. Phir maa ko batao. Phir dost ko. Phir yahan aakar padho: yeh tumne kiya hai. Order important hai.", tags:[]},
       {t:"Tumhari aadat hai win ko \u201ckuch khaas nahi\u201d bolne ki. Aaj woh aadat chhutti pe hai. Poora sentence bolo: maine yeh kiya, aur accha kiya.", tags:[]},
       {t:"Jab koi tumhe bina tumhare maange chun le, usko luck nahi kehte. Usko \u201cunhone kaam dekh liya\u201d kehte hain. Aaj bhi wahi hua hoga.", tags:[]},
-      {t:"Celebrate karne ka tumhara style: dost, khana, aur ek accha outfit. Jo bhi aaj possible hai, kar lo. Kal office wale jal jayein toh unki problem.", tags:[]},
+      {t:"Celebrate karne ka tumhara style: log, khana, aur ek accha outfit. Jo bhi aaj possible hai, kar lo. Kal office wale jal jayein toh unki problem.", tags:[]},
       {t:"Aaj ka win yaad rakhna. Agle \u201ctoo good to be true\u201d wale din ke liye evidence chahiye hoga. Compliance wale bina evidence ke kuch nahi maante.", tags:[]},
       {t:"Kuch accha hua aur pehla khayal \u201cpakka?\u201d aaya? Haan, pakka. Aaj sirf \u201cwow\u201d allowed hai. \u201cPakka\u201d kal ke liye.", tags:[]},
       {t:"Tum doosron ke wins pe poore dil se \u201cHappy for you 🥹\u201d bhejti ho. Aaj koi tumhe wahi bhej raha hai. Le lo. Deflect mat karo.", tags:[]},
@@ -636,6 +728,9 @@ const MOODS = [
   {
     id:"night", em:"🌙", label:"Can\u2019t sleep",
     quotes:[
+      {t:"Raat ke teen baje wala dimaag ek dost hai jo hamesha bura advice deta hai. Sunna zaroori nahi.", tags:[]},
+      {t:"Aaj ki neend kal ka mood decide karegi. Poora din ek button pe hai, aur woh button phone rakhna hai.", tags:[]},
+      {t:"Yeh page subah bhi yahin hoga. Ab aankhen band.", tags:[]},
       {t:"Raat ka yeh time tumhara thinking hour hai, pata hai. Bas ek deal: jo bhi aaj sochogi, subah dobara check karogi. Raat ke faisle count nahi hote.", tags:[]},
       {t:"Neend nahi aa rahi toh \u201cChill mode\u201d laga lo. Woh playlist isi kaam ke liye bani thi, chahe update na hui ho.", tags:[]},
       {t:"Neend nahi aa rahi aur kisi se baat karne ka mann hai? Yeh mood tum \u201cese hi kiya\u201d bolke chhupati ho. Chhupane ki zarurat nahi. Tumhare doston ke liye 1 baje ka \u201ckaha ho?\u201d bhi welcome hai. Tumne unke liye bhi kiya hai.", tags:[]},
@@ -654,6 +749,9 @@ const MOODS = [
   {
     id:"quiet", em:"🤫", label:"Just want to read quietly",
     quotes:[
+      {t:"Kuch nahi bolna? Theek hai. Yahan koi form nahi bharna.", tags:[]},
+      {t:"Aaj sirf saans. Baaki kal.", tags:[]},
+      {t:"Padh liya. Ab band kar do. Milte hain.", tags:[]},
       {t:"\u201cGive me sometime\u201d apne aap mein poora sentence hai. Aaj na reply chahiye, na explanation. Yeh page yahin milega, jab bhi mann ho.", tags:["quiet"]},
       {t:"Is page pe na read receipts hain, na last seen, aur koi reply ka wait nahi kar raha. Padho, smile karo ya mat karo, aur band kar do.", tags:["quiet"]},
       {t:"Aaj kuch nahi bolna hai? Theek hai. Yahan bhi kuch nahi bola jayega. Bas yeh line, aur phir chup.", tags:["quiet"]},
@@ -760,10 +858,6 @@ try {
 
   /* text-me links */
   document.querySelectorAll("[data-textme]").forEach(a => { a.href = "https://wa.me/" + WHATSAPP_NUMBER; });
-  function setTextMe(moodId){
-    const hide = moodId === "quiet";
-    document.querySelectorAll("#quoteScreen [data-textme]").forEach(a => { a.hidden = hide; });
-  }
 
   /* sunflower petals */
   const g = $("petals");
@@ -799,15 +893,70 @@ try {
     li.appendChild(b); ul.appendChild(li);
   });
 
+  /* dwell time: long enough to read twice, short enough to feel like a dose */
+  function dwellMs(text){
+    const words = text.trim().split(/\s+/).length;
+    return Math.min(40000, Math.max(20000, 9000 + words * 380));
+  }
+
+  const sheet = $("sheet"), sheetCard = $("sheetCard"), dwellBar = $("dwellBar");
+  let timer = null, tStart = 0, tLeft = 0, paused = false;
+
+  function runTimer(ms){
+    clearTimeout(timer);
+    tLeft = ms; tStart = Date.now(); paused = false;
+    dwellBar.style.transition = "none";
+    dwellBar.style.transform = "scaleX(1)";
+    void dwellBar.offsetWidth;
+    dwellBar.style.transition = "transform " + ms + "ms linear";
+    dwellBar.style.transform = "scaleX(0)";
+    timer = setTimeout(closeSheet, ms);
+  }
+  function pauseTimer(){
+    if (paused || !timer) return;
+    paused = true;
+    clearTimeout(timer);
+    tLeft = Math.max(3000, tLeft - (Date.now() - tStart));
+    const w = dwellBar.getBoundingClientRect().width / dwellBar.parentElement.getBoundingClientRect().width;
+    dwellBar.style.transition = "none";
+    dwellBar.style.transform = "scaleX(" + w + ")";
+  }
+  function resumeTimer(){
+    if (!paused) return;
+    paused = false; tStart = Date.now();
+    dwellBar.style.transition = "transform " + tLeft + "ms linear";
+    dwellBar.style.transform = "scaleX(0)";
+    timer = setTimeout(closeSheet, tLeft);
+  }
+
   function paint(){
     const it = current.items[current.pos];
     const mood = moodById(it.moodId);
+    const text = mood.quotes[it.idx].t;
     $("qlabel").textContent = current.label;
     const q = $("quote");
     q.classList.remove("enter"); void q.offsetWidth;
-    q.textContent = mood.quotes[it.idx].t;
+    q.textContent = text;
     q.classList.add("enter");
     current.last = it;
+    runTimer(dwellMs(text));
+  }
+  function openSheet(){
+    sheet.hidden = false;
+    sheet.setAttribute("aria-hidden", "false");
+    void sheet.offsetWidth;
+    sheet.classList.add("in");
+    document.body.style.overflow = "hidden";
+  }
+  function closeSheet(){
+    clearTimeout(timer); timer = null;
+    sheet.classList.remove("in"); sheet.classList.add("out");
+    document.body.style.overflow = "";
+    setTimeout(() => {
+      sheet.classList.remove("out");
+      sheet.hidden = true;
+      sheet.setAttribute("aria-hidden", "true");
+    }, 300);
   }
   function open(moodId, fromRandom){
     current = {
@@ -816,19 +965,48 @@ try {
       label: fromRandom ? "Random dose" : moodById(moodId).label,
       last: null
     };
-    setTextMe(moodId);
-    show("quoteScreen");
+    openSheet();
     paint();
   }
-  $("moreBtn").addEventListener("click", () => {
+  function nextQuote(){
     current.pos++;
     if (current.pos >= current.items.length){
       current.items = reshuffle(current.items, current.last);
       current.pos = 0;
     }
     paint();
+  }
+  $("moreBtn").addEventListener("click", nextQuote);
+  $("sheetClose").addEventListener("click", closeSheet);
+  $("sheetBackdrop").addEventListener("click", closeSheet);
+
+  /* holding the card pauses the countdown; nobody should lose a line mid-read */
+  ["pointerdown","touchstart"].forEach(e => sheetCard.addEventListener(e, pauseTimer, {passive:true}));
+  ["pointerup","pointercancel","touchend","touchcancel"].forEach(e => sheetCard.addEventListener(e, resumeTimer, {passive:true}));
+  sheetCard.addEventListener("mouseenter", pauseTimer);
+  sheetCard.addEventListener("mouseleave", resumeTimer);
+  document.addEventListener("visibilitychange", () => { document.hidden ? pauseTimer() : resumeTimer(); });
+
+  /* swipe: left for the next line, down to dismiss */
+  let sx = 0, sy = 0, tracking = false;
+  sheetCard.addEventListener("touchstart", e => {
+    if (e.touches.length !== 1) return;
+    tracking = true; sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+  }, {passive:true});
+  sheetCard.addEventListener("touchend", e => {
+    if (!tracking) return;
+    tracking = false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) nextQuote();
+    else if (dy > 70 && Math.abs(dy) > Math.abs(dx)) closeSheet();
+  }, {passive:true});
+
+  document.addEventListener("keydown", e => {
+    if (sheet.hidden) return;
+    if (e.key === "Escape") closeSheet();
+    if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextQuote(); }
   });
-  $("backBtn").addEventListener("click", () => show("home"));
 
   /* meri aankhon se */
   $("eyesBtn").addEventListener("click", () => {
@@ -836,6 +1014,13 @@ try {
     const L = $("letter"); L.classList.remove("enter"); void L.offsetWidth; L.classList.add("enter");
   });
   $("eyesBack").addEventListener("click", () => show("home"));
+
+  /* ek mahina */
+  $("monthBtn").addEventListener("click", () => {
+    show("month");
+    const L = $("monthLetter"); L.classList.remove("enter"); void L.offsetWidth; L.classList.add("enter");
+  });
+  $("monthBack").addEventListener("click", () => show("home"));
 
   /* gate */
   window.hashOf = hashOf;
