@@ -11,39 +11,47 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..600,100;1,9..144,300..600,100&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#16223A;
-    --navy-2:#1E2B47;
-    --sand:#E8DDC6;
-    --sand-2:#D9CBAE;
-    --sun:#E0A93A;
-    --sun-2:#A87A24;
-    --mist:#E7E3D9;
-    --paper:#FBF8F1;
-    --ink:#14161C;
-    --ink-soft:#5A5F6B;
+    --navy:#182642;
+    --navy-2:#21324F;
+    --sand:#F0E3C6;
+    --sand-2:#DCC79B;
+    --sun:#E9A927;
+    --sun-2:#A86F12;
+    --leaf:#6E8B5E;
+    --rose:#C9807F;
+    --mist:#F3EAD8;
+    --paper:#FFFCF4;
+    --ink:#221E19;
+    --ink-soft:#6B6357;
     --bg:var(--mist);
     --surface:var(--paper);
-    --line:rgba(22,34,58,.14);
+    --line:rgba(34,30,25,.13);
     --focus:var(--sun);
+    --a:var(--sun);
+    --a-soft:rgba(233,169,39,.14);
+    --a-line:rgba(233,169,39,.42);
     --radius:22px;
-    --radius-s:14px;
+    --radius-s:16px;
     --font-serif:"Fraunces", Georgia, "Times New Roman", serif;
     --font-sans:"Karla", system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   html[data-theme="night"]{
-    --ink:var(--sand);
-    --ink-soft:#ACA79A;
-    --bg:var(--navy);
-    --surface:var(--navy-2);
-    --line:rgba(232,221,198,.15);
+    --ink:#F2E7D2;
+    --ink-soft:#A99E8A;
+    --bg:#121C31;
+    --surface:#1B2942;
+    --line:rgba(240,227,198,.16);
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
+  html{min-height:100%}
+  body{min-height:100dvh}
   body{
     margin:0;
     background:
-      radial-gradient(120% 70% at 50% -10%, rgba(255,255,255,.55), transparent 60%),
-      var(--bg);
+      radial-gradient(80% 46% at 78% -6%, rgba(233,169,39,.30), transparent 62%),
+      radial-gradient(70% 42% at 6% 16%, rgba(110,139,94,.16), transparent 60%),
+      radial-gradient(90% 50% at 50% 104%, rgba(201,128,127,.16), transparent 60%),
+      linear-gradient(180deg,#FFFAEE 0%, var(--bg) 46%, #F0E5CE 100%);
     color:var(--ink);
     font-family:var(--font-sans);
     font-size:17px;
@@ -60,6 +68,7 @@
     max-width:34rem;
     margin:0 auto;
     min-height:100dvh;
+    overflow-x:clip;
     padding:max(18px, env(safe-area-inset-top)) 20px calc(28px + env(safe-area-inset-bottom));
     display:flex;
     flex-direction:column;
@@ -67,6 +76,20 @@
   }
 
   /* top row */
+  .bloom{
+    position:absolute;
+    top:-62px;right:-42px;
+    width:186px;height:186px;
+    opacity:.24;
+    z-index:0;
+    pointer-events:none;
+    animation:turn 200s linear infinite;
+    transform-origin:50% 50%;
+  }
+  html[data-theme="night"] .bloom{opacity:.22}
+  .screen,.top{position:relative;z-index:1}
+  @media (max-width:380px){ .bloom{width:156px;height:156px;right:-36px} }
+
   .top{
     display:flex;
     align-items:center;
@@ -106,7 +129,8 @@
     letter-spacing:-.01em;
     margin:0 0 6px;
   }
-  .ask em{font-style:italic;font-weight:400}
+  .ask em{font-style:italic;font-weight:400;color:var(--sun-2)}
+  html[data-theme="night"] .ask em{color:var(--sun)}
   .sub{
     margin:0 0 26px;
     color:var(--ink-soft);
@@ -122,34 +146,48 @@
   .moods li:first-child{grid-column:1/-1}
   .mood{
     width:100%;
+    position:relative;
     text-align:left;
-    padding:16px 16px 15px;
+    padding:16px 15px 15px 16px;
     border-radius:var(--radius-s);
-    background:var(--surface);
-    border:1px solid var(--line);
+    background:
+      linear-gradient(135deg, var(--a-soft) 0%, rgba(255,255,255,0) 70%),
+      var(--surface);
+    border:1px solid var(--a-line);
     font-weight:500;
     font-size:16px;
     line-height:1.3;
-    min-height:66px;
+    min-height:70px;
     display:flex;
     align-items:center;
     gap:11px;
-    box-shadow:0 1px 0 rgba(20,22,28,.03);
-    transition:transform .18s ease, border-color .18s ease, box-shadow .2s ease;
+    box-shadow:0 10px 22px -20px rgba(34,30,25,.75);
+    transition:transform .18s ease, box-shadow .22s ease;
   }
   .mood:active{transform:scale(.97)}
   @media (hover:hover){
-    .mood:hover{border-color:var(--sun);box-shadow:0 6px 18px -12px rgba(20,22,28,.4)}
+    .mood:hover{transform:translateY(-2px);box-shadow:0 16px 26px -20px rgba(34,30,25,.85)}
   }
-  .mood .em{font-size:20px;line-height:1;flex:none;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+  .mood .em{
+    width:36px;height:36px;flex:none;
+    display:grid;place-items:center;
+    border-radius:12px;
+    background:var(--a-soft);
+    border:1px solid var(--a-line);
+    font-size:18px;line-height:1;
+    font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+  }
   .mood.random{
-    background:var(--sun);
-    color:var(--navy);
+    background:linear-gradient(135deg,#F2BB3E 0%, var(--sun) 52%, #D08E16 100%);
+    color:#2A1E06;
     border-color:transparent;
     justify-content:center;
     text-align:center;
     font-weight:600;
+    min-height:62px;
+    box-shadow:0 16px 30px -18px rgba(168,111,18,.75);
   }
+  .mood.random .em{background:rgba(255,255,255,.34);border-color:rgba(255,255,255,.5)}
   .mood.random:hover{border-color:transparent}
 
   /* quote sheet */
@@ -168,10 +206,13 @@
     width:min(34rem,100%);
     margin:0 12px calc(12px + env(safe-area-inset-bottom));
     background:var(--surface);
-    border:1px solid var(--line);
+    border:1px solid var(--a-line);
     border-radius:26px;
     padding:26px 22px 18px;
-    box-shadow:0 30px 70px -34px rgba(20,22,28,.55);
+    background:
+      radial-gradient(120% 60% at 88% -10%, var(--a-soft), transparent 62%),
+      var(--surface);
+    box-shadow:0 34px 70px -34px rgba(34,30,25,.6);
     transform:translateY(16px);opacity:0;
     transition:transform .34s cubic-bezier(.2,.8,.25,1),opacity .28s ease;
     touch-action:pan-y;
@@ -189,7 +230,7 @@
   }
   @keyframes turn{to{transform:rotate(360deg)}}
   .sheet-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-  .qlabel{font-size:13.5px;color:var(--ink-soft);margin:0 0 14px;padding-right:60px}
+  .qlabel{font-size:13.5px;color:var(--a);font-weight:600;letter-spacing:.01em;margin:0 0 14px;padding-right:60px}
   .sheet-x{
     width:34px;height:34px;flex:none;margin-top:-6px;border-radius:50%;
     border:1px solid var(--line);color:var(--ink-soft);font-size:19px;line-height:1;
@@ -206,7 +247,7 @@
   @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   .sheet-foot{display:flex;align-items:center;gap:14px;margin-top:24px}
   .dwell{flex:1;height:2px;border-radius:999px;background:var(--line);overflow:hidden}
-  .dwell i{display:block;height:100%;width:100%;background:var(--sun);transform-origin:left center;transform:scaleX(1)}
+  .dwell i{display:block;height:100%;width:100%;background:var(--a);transform-origin:left center;transform:scaleX(1)}
   .btn{
     padding:11px 18px;border-radius:999px;font-weight:600;font-size:14.5px;
     border:1px solid var(--line);background:transparent;
@@ -214,7 +255,7 @@
   }
   .btn:active{transform:scale(.97)}
   .btn.primary{background:var(--ink);color:var(--paper);border-color:transparent}
-  .btn.ghost{flex:none;background:var(--surface)}
+  .btn.ghost{flex:none;background:var(--a-soft);border-color:var(--a-line)}
   @media (hover:hover){ .btn.ghost:hover{border-color:var(--sun)} }
   .btn[disabled]{opacity:.35;cursor:default}
 
@@ -243,7 +284,7 @@
     border-radius:var(--radius-s);
     border:1px solid rgba(224,169,58,.55);
     border-left:4px solid var(--sun);
-    background:rgba(224,169,58,.12);
+    background:linear-gradient(0deg, rgba(233,169,39,.16), rgba(233,169,39,.16)), var(--surface);
     text-align:left;
     font-family:var(--font-serif);
     font-variation-settings:"SOFT" 100, "opsz" 24;
@@ -261,12 +302,22 @@
   }
   .eyes-link:active{transform:scale(.98)}
   .eyes-link.month{
-    border-color:var(--line);
-    border-left:4px solid var(--sand-2);
-    background:var(--surface);
+    border-color:rgba(110,139,94,.5);
+    border-left:4px solid var(--leaf);
+    background:linear-gradient(0deg, rgba(110,139,94,.14), rgba(110,139,94,.14)), var(--surface);
   }
-  @media (hover:hover){ .eyes-link.month:hover{background:rgba(217,203,174,.25)} }
+  @media (hover:hover){ .eyes-link.month:hover{background:linear-gradient(0deg, rgba(110,139,94,.24), rgba(110,139,94,.24)), var(--surface)} }
   html[data-theme="night"] .eyes-link.month{border-left-color:var(--sun-2)}
+  .eyes-link.girl{
+    border-color:rgba(201,128,127,.5);
+    border-left:4px solid var(--rose);
+    background:linear-gradient(0deg, rgba(201,128,127,.14), rgba(201,128,127,.14)), var(--surface);
+  }
+  @media (hover:hover){ .eyes-link.girl:hover{background:linear-gradient(0deg, rgba(201,128,127,.24), rgba(201,128,127,.24)), var(--surface)} }
+  .letter.girl{border-color:rgba(201,128,127,.45)}
+  .letter.girl .letter-sub,.letter.girl .letter-end{border-color:rgba(201,128,127,.45)}
+  .letter.girl .letter-end{color:#A85F5E}
+  html[data-theme="night"] .letter.girl .letter-end{color:var(--rose)}
   .letter.month{border-color:var(--line)}
   .song{
     display:flex;align-items:center;gap:13px;
@@ -294,7 +345,7 @@
   .song small{display:block;font-family:var(--font-sans);font-size:13.5px;color:var(--ink-soft);margin-top:3px}
   .letter.month .letter-sub,.letter.month .letter-end{border-color:var(--line)}
   .letter.month .letter-end{color:var(--ink-soft)}
-  @media (hover:hover){ .eyes-link:hover{background:rgba(224,169,58,.2)} }
+  @media (hover:hover){ .eyes-link:hover{background:linear-gradient(0deg, rgba(233,169,39,.26), rgba(233,169,39,.26)), var(--surface)} }
 
   .letter{
     position:relative;
@@ -415,6 +466,8 @@
 </svg>
 <div class="app">
 
+  <svg class="bloom" viewBox="0 0 200 200" aria-hidden="true"><use href="#sunflowerShape"/></svg>
+
   <div class="top">
     <div class="greet" id="greet">Hello.</div>
     <button class="theme-btn" id="themeBtn" aria-label="Switch day or night" title="Day / night">
@@ -440,6 +493,7 @@
     <ul class="moods" id="moods"></ul>
     <button class="eyes-link" id="eyesBtn" type="button">Meri aankhon se<small>Things I never said. Read when you have a minute.</small></button>
     <button class="eyes-link month" id="monthBtn" type="button">One month.<small>A short note, a month after Dubai. No reply needed.</small></button>
+    <button class="eyes-link girl" id="girlBtn" type="button">Ladki wali baatein.<small>Woh cheezein jo tum normal samajhti ho. Woh normal nahi hain.</small></button>
     <p class="foot">No read receipts. No last seen. Nobody can see what you tapped.<br><a class="textme" href="#" target="_blank" rel="noopener" data-textme><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 0 1 0 16.4c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8zm-3 4.4c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3l-2-.9c-.3-.1-.5-.2-.7.2l-.9 1.1c-.2.2-.3.2-.6.1a6.8 6.8 0 0 1-3.4-3c-.3-.4 0-.5.2-.8l.6-.8c.1-.2 0-.4 0-.6l-.9-2.2c-.2-.5-.4-.5-.6-.5H9z"/></svg><span>Text me. No reason needed.</span></a></p>
   </section>
 
@@ -480,6 +534,34 @@
       <p class="letter-end">Yeh sab maine kabhi bola nahi. Ab likh diya. Jab bhi khud pe shaq ho, yahan aa jana. Yeh page nahi badlega.</p>
     </div>
     <div class="eyes-actions"><button class="btn" id="eyesBack" type="button">Back</button></div>
+  </section>
+
+  <!-- ladki wali baatein -->
+  <section class="screen" id="girl" aria-label="Ladki wali baatein">
+    <div class="letter girl" id="girlLetter">
+      <svg class="letter-sun" viewBox="0 0 200 200" aria-hidden="true"><use href="#sunflowerShape"/></svg>
+      <h1 class="letter-head">Ladki wali baatein.</h1>
+      <p class="letter-sub">Ek list un cheezon ki jo tum roz karti ho aur ginti nahi ho.</p>
+
+      <p>Tumse koi bhi poochh le, shade kaunsa lena chahiye, aur tum do minute mein bata deti ho. Sirf colour nahi. Fit, fabric, kis mauke pe pehnenge, kis cheez ke saath chalega. Aur phir bolti ho, isme kya badi baat hai.</p>
+
+      <p>Badi baat yeh hai ki tum dekh rahi hoti ho. Zyadatar log dekhte nahi hain, bas dekhne ka natak karte hain.</p>
+
+      <p>Tumhare paas har cheez ka ek version hai. Playlist ka ek mood, mirror ka ek angle, outfit ka ek plan, khane ka ek order jo tumhe zubani yaad hai. Log ise chhoti cheezein bolte hain. Chhoti cheezein hi toh din banati hain. Baaki sab toh bas calendar hai.</p>
+
+      <p>Tum unn ladkiyon mein se ho jo apne dost ke liye ghanton lagakar sahi tohfa dhoondhti hain, packing tak sochti hain, aur phir delivery se pehle bol deti hain ki umeed mat rakhna, hamari choices alag hain. Aur cheez perfect nikalti hai. Har baar.</p>
+
+      <p>Tumhe accha lagta hai jab jagah acchi ho. Roshni sahi ho, kona sahi ho, plate dhang ki ho. Yeh nakhre nahi hain. Yeh apne aap se yeh kehna hai ki mera din bhi thoda sundar hona chahiye. Bahut kam log yeh apne liye maangte hain.</p>
+
+      <p>Aur yeh sab tumhare us hisse ke saath chalta hai jo Saturday ko bhi office jaata hai, jo compliance mein logon ko seedha nahi bolta, jo chaubis saal ki umar mein akeli doosre desh chali gayi. Dono ek hi ladki hai. Yeh koi contradiction nahi hai. Log sochte hain jo ladki shade aur playlist ki parwah karti hai woh serious nahi hogi. Tum unka sabse aaram se toda hua andaaza ho.</p>
+
+      <p>Jo cheez sabse upar hai, woh yeh: tum dhyaan rakhne ko kaam nahi bana deti. Reach hoke text karna. Kuch khaya. Tabiyat kaisi hai. Raat ke do baje ek chhota sa are you ok. Tum ise bina shor ke karti ho, aur kabhi wapas nahi maangti. Bahut se log care karte hain. Bahut kam log ise itna halka rakh paate hain.</p>
+
+      <p>Toh agli baar jab tum kisi cheez ke liye bolo ki this is nothing, thoda ruk jaana. Yahan uski poori list likhi hai, aur woh nothing nahi hai.</p>
+
+      <p class="letter-end">Yeh page kahin nahi jaa raha. Jab kabhi lage ki tum bas ek normal si ladki ho jo shades aur playlists mein time waste karti hai, yahan aa jana.</p>
+    </div>
+    <div class="eyes-actions"><button class="btn" id="girlBack" type="button">Back</button></div>
   </section>
 
   <!-- one month -->
@@ -545,11 +627,11 @@ const WHATSAPP_NUMBER = "919829371844";   // country code + number, digits only
    ========================================================= */
 const MOODS = [
   {
-    id:"random", em:"💊", label:"Random dose", random:true,
+    id:"random", accent:"#E9A927", em:"💊", label:"Random dose", random:true,
     pool:["bore","battery","overwhelmed"], nightPool:["bore","battery","overwhelmed","night"]
   },
   {
-    id:"bore", em:"🥱", label:"Bored",
+    id:"bore", accent:"#5E8C86", em:"🥱", label:"Bored",
     quotes:[
       {t:"Naina ki tarah plan ka wait mat karo. Uske paas bhi koi plan nahi tha, bas ek trek tha aur ek haan.", tags:[]},
       {t:"Aaj ka kaam: ek gaana dhoondho jo tumne kabhi nahi suna. Bas ek. Baaki din apne aap chal jayega.", tags:[]},
@@ -571,7 +653,7 @@ const MOODS = [
     ]
   },
   {
-    id:"office", em:"🙄", label:"Office people",
+    id:"office", accent:"#C2705A", em:"🙄", label:"Office people",
     quotes:[
       {t:"Office ke logon ko tumhara poora din nahi dikhta. Unhe sirf woh dikhta hai jo tum bacha ke deti ho. Tumhara best version unka haq nahi hai.", tags:[]},
       {t:"Aaj kisi meeting mein tum chup rahi, aur baad mein laga bol deti toh accha hota? Chup rehna bhi ek reply hai. Woh bhi count hota hai.", tags:[]},
@@ -594,7 +676,7 @@ const MOODS = [
     ]
   },
   {
-    id:"battery", em:"🔋", label:"Battery 1%",
+    id:"battery", accent:"#7E8F5A", em:"🔋", label:"Battery 1%",
     quotes:[
       {t:"Charging ka matlab hai kuch der ke liye kisi kaam ka na hona. Phone ke saath toh maan lete ho. Khud ke saath bhi maan lo.", tags:[]},
       {t:"Aaj ka poora to-do list: khana, paani, neend. Teeno ho gaye toh din successful tha.", tags:[]},
@@ -616,7 +698,7 @@ const MOODS = [
     ]
   },
   {
-    id:"overwhelmed", em:"😵‍💫", label:"Can\u2019t figure anything out",
+    id:"overwhelmed", accent:"#7C6E9C", em:"😵‍💫", label:"Can\u2019t figure anything out",
     quotes:[
       {t:"Naina ne bhi ek raat mein poori life decide nahi ki thi. Bas ek bag pack kiya tha. Aaj bas ek cheez uthao.", tags:[]},
       {t:"Sab kuch urgent lag raha hai? Ek list banao aur har cheez ke aage likho: aaj, is hafte, ya kabhi nahi. Teesri category sabse lambi niklegi.", tags:[]},
@@ -638,7 +720,7 @@ const MOODS = [
     ]
   },
   {
-    id:"toogood", em:"🫣", label:"Too good to be true?",
+    id:"toogood", accent:"#D08A2E", em:"🫣", label:"Too good to be true?",
     quotes:[
       {t:"Log tumhari life ko luck bolte hain kyunki unhone highlights dekhe hain, raat ke do baje wale hisse nahi.", tags:[]},
       {t:"Naina ne bhi socha hoga ki woh trip pe jaakar galti kar rahi hai. Film ka aadha hissa uske us faisle pe khada hai.", tags:[]},
@@ -660,7 +742,7 @@ const MOODS = [
     ]
   },
   {
-    id:"home", em:"🏡", label:"Missing my people",
+    id:"home", accent:"#C9807F", em:"🏡", label:"Missing my people",
     quotes:[
       {t:"Ghar ki yaad aana matlab tumne kahin kuch accha banaya tha jo chhod ke aana pada. Yeh loss nahi hai. Yeh proof hai.", tags:[]},
       {t:"Naina ne bhi ghar chhoda, ghoomi, aur wapas aayi. Dono cheezein ek saath sach ho sakti hain: yahan rehna aur wahan se juda rehna.", tags:[]},
@@ -682,7 +764,7 @@ const MOODS = [
     ]
   },
   {
-    id:"doubt", em:"🪞", label:"Not feeling myself",
+    id:"doubt", accent:"#5C7392", em:"🪞", label:"Not feeling myself",
     quotes:[
       {t:"Naina ko poori film lagti rahi ki woh kamre mein sabse boring insaan hai. Dekhne wale sab jaante the ki woh sabse zyada dhyaan dene wali thi. Tumhare saath bhi wahi ho raha hai.", tags:[]},
       {t:"Aaj khud ke baare mein jo bhi soch rahi ho, woh aankhon se aa raha hai jo thaki hui hain. Thake hue log accha judge nahi kar paate. Kal dobara dekhna.", tags:[]},
@@ -705,7 +787,7 @@ const MOODS = [
     ]
   },
   {
-    id:"win", em:"🥳", label:"Something good happened",
+    id:"win", accent:"#D8734F", em:"🥳", label:"Something good happened",
     quotes:[
       {t:"Aaj wali khushi ko kisi aur ke reaction ka intezaar mat karwao. Pehle khud ko de do.", tags:[]},
       {t:"Naina ne apni trip ki tasveerein kisi ko dikhane ke liye nahi li thi. Kuch cheezein sirf tumhare liye hoti hain. Yeh waali bhi.", tags:[]},
@@ -726,7 +808,7 @@ const MOODS = [
     ]
   },
   {
-    id:"night", em:"🌙", label:"Can\u2019t sleep",
+    id:"night", accent:"#4C5F96", em:"🌙", label:"Can\u2019t sleep",
     quotes:[
       {t:"Raat ke teen baje wala dimaag ek dost hai jo hamesha bura advice deta hai. Sunna zaroori nahi.", tags:[]},
       {t:"Aaj ki neend kal ka mood decide karegi. Poora din ek button pe hai, aur woh button phone rakhna hai.", tags:[]},
@@ -747,7 +829,7 @@ const MOODS = [
     ]
   },
   {
-    id:"quiet", em:"🤫", label:"Just want to read quietly",
+    id:"quiet", accent:"#8C8676", em:"🤫", label:"Just want to read quietly",
     quotes:[
       {t:"Kuch nahi bolna? Theek hai. Yahan koi form nahi bharna.", tags:[]},
       {t:"Aaj sirf saans. Baaki kal.", tags:[]},
@@ -787,6 +869,11 @@ function shuffle(arr, rnd = Math.random){
   return a;
 }
 function moodById(id){ return MOODS.find(m => m.id === id); }
+function rgba(hex, a){
+  const h = hex.replace("#","");
+  const n = parseInt(h.length === 3 ? h.split("").map(c=>c+c).join("") : h, 16);
+  return "rgba(" + ((n>>16)&255) + "," + ((n>>8)&255) + "," + (n&255) + "," + a + ")";
+}
 
 function buildQueue(moodId, rnd = Math.random){
   const m = moodById(moodId);
@@ -882,12 +969,19 @@ try {
   }
 
   /* moods grid */
+  function tint(el, hex, strong){
+    el.style.setProperty("--a", hex);
+    el.style.setProperty("--a-soft", rgba(hex, strong ? .2 : .2));
+    el.style.setProperty("--a-line", rgba(hex, strong ? .55 : .45));
+  }
+
   const ul = $("moods");
   MOODS.forEach(m => {
     const li = document.createElement("li");
     const b = document.createElement("button");
     b.type = "button";
     b.className = "mood" + (m.random ? " random" : "");
+    if (m.accent) tint(b, m.accent, false);
     b.innerHTML = `<span class="em" aria-hidden="true">${m.em}</span><span>${m.label}</span>`;
     b.addEventListener("click", () => open(m.id, m.random));
     li.appendChild(b); ul.appendChild(li);
@@ -900,7 +994,7 @@ try {
   }
 
   const sheet = $("sheet"), sheetCard = $("sheetCard"), dwellBar = $("dwellBar");
-  let timer = null, tStart = 0, tLeft = 0, paused = false;
+  let timer = null, tStart = 0, tLeft = 0, paused = false, openedAt = 0;
 
   function runTimer(ms){
     clearTimeout(timer);
@@ -933,6 +1027,7 @@ try {
     const it = current.items[current.pos];
     const mood = moodById(it.moodId);
     const text = mood.quotes[it.idx].t;
+    if (mood.accent) tint(sheetCard, mood.accent, true);
     $("qlabel").textContent = current.label;
     const q = $("quote");
     q.classList.remove("enter"); void q.offsetWidth;
@@ -942,6 +1037,7 @@ try {
     runTimer(dwellMs(text));
   }
   function openSheet(){
+    openedAt = Date.now();
     sheet.hidden = false;
     sheet.setAttribute("aria-hidden", "false");
     void sheet.offsetWidth;
@@ -965,6 +1061,7 @@ try {
       label: fromRandom ? "Random dose" : moodById(moodId).label,
       last: null
     };
+    tint(sheetCard, moodById(moodId).accent || "#E9A927", true);
     openSheet();
     paint();
   }
@@ -980,11 +1077,20 @@ try {
   $("sheetClose").addEventListener("click", closeSheet);
   $("sheetBackdrop").addEventListener("click", closeSheet);
 
-  /* holding the card pauses the countdown; nobody should lose a line mid-read */
-  ["pointerdown","touchstart"].forEach(e => sheetCard.addEventListener(e, pauseTimer, {passive:true}));
-  ["pointerup","pointercancel","touchend","touchcancel"].forEach(e => sheetCard.addEventListener(e, resumeTimer, {passive:true}));
-  sheetCard.addEventListener("mouseenter", pauseTimer);
-  sheetCard.addEventListener("mouseleave", resumeTimer);
+  /* Holding the card pauses the countdown so a line is never pulled away mid-read.
+     The card slides up under the finger, so anything in the first moment after
+     opening is the tap that opened it, not a deliberate hold. Ignore that. */
+  const OPEN_GRACE = 600;
+  function heldPause(){ if (Date.now() - openedAt > OPEN_GRACE) pauseTimer(); }
+
+  ["touchstart"].forEach(e => sheetCard.addEventListener(e, heldPause, {passive:true}));
+  ["touchend","touchcancel"].forEach(e => sheetCard.addEventListener(e, resumeTimer, {passive:true}));
+
+  /* hover pause only where there is a real cursor, never on touch screens */
+  if (window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches){
+    sheetCard.addEventListener("mouseenter", heldPause);
+    sheetCard.addEventListener("mouseleave", resumeTimer);
+  }
   document.addEventListener("visibilitychange", () => { document.hidden ? pauseTimer() : resumeTimer(); });
 
   /* swipe: left for the next line, down to dismiss */
@@ -1021,6 +1127,13 @@ try {
     const L = $("monthLetter"); L.classList.remove("enter"); void L.offsetWidth; L.classList.add("enter");
   });
   $("monthBack").addEventListener("click", () => show("home"));
+
+  /* ladki wali baatein */
+  $("girlBtn").addEventListener("click", () => {
+    show("girl");
+    const L = $("girlLetter"); L.classList.remove("enter"); void L.offsetWidth; L.classList.add("enter");
+  });
+  $("girlBack").addEventListener("click", () => show("home"));
 
   /* gate */
   window.hashOf = hashOf;
